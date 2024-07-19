@@ -4,9 +4,13 @@ import { comparePassword } from "../../libs/bcrypt";
 import { appConfig } from "../../utils/config";
 import { sign } from "jsonwebtoken";
 
-export const signInService = async (body: Pick<User, "email" | "password">) => {
+interface BodyPayload extends Pick<User, "email" | "password"> {
+  isRememberMe: boolean;
+}
+
+export const signInService = async (body: BodyPayload) => {
   try {
-    const { email, password } = body;
+    const { email, password, isRememberMe } = body;
 
     const user = await prisma.user.findFirst({
       where: { email },
@@ -29,9 +33,17 @@ export const signInService = async (body: Pick<User, "email" | "password">) => {
       expiresIn: "15m",
     });
 
-    const refreshToken = sign({ id: user.id }, appConfig.secret, {
-      expiresIn: "1d",
-    });
+    let refreshToken;
+
+    if (!isRememberMe) {
+      refreshToken = sign({ id: user.id }, appConfig.secret, {
+        expiresIn: "1d",
+      });
+    } else {
+      refreshToken = sign({ id: user.id }, appConfig.secret, {
+        expiresIn: "7d",
+      });
+    }
 
     const existingToken = await prisma.refreshToken.findFirst({
       where: { userId: user.id },
@@ -52,7 +64,7 @@ export const signInService = async (body: Pick<User, "email" | "password">) => {
     }
 
     return {
-      msg: `Login success as ${email}`,
+      msg: `Sign In Successfully as ${email}`,
       token: accessToken,
     };
   } catch (error) {

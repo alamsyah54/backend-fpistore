@@ -26,7 +26,6 @@ export const verifyToken = (
   next: NextFunction
 ) => {
   const token = req.headers.authorization?.split(" ")[1];
-  const refreshToken = req.headers["x-refresh-token"] as string;
 
   if (!token) {
     return res.status(401).send({

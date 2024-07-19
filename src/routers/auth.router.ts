@@ -13,7 +13,6 @@ export class AuthRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get("/:id", verifyToken, this.authController.getUserController);
     this.router.post("/sign-up", this.authController.signUpController);
     this.router.post("/sign-in", this.authController.signInController);
   }
