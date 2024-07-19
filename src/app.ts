@@ -8,6 +8,7 @@ import express, {
 import { PORT } from "./config";
 import { AuthRouter } from "./routers/auth.router";
 import { UserRouter } from "./routers/user.router";
+import { ProductRouter } from "./routers/product.router";
 
 export default class App {
   private app: Express;
@@ -51,6 +52,7 @@ export default class App {
   private routes(): void {
     const authRouter = new AuthRouter();
     const userRouter = new UserRouter();
+    const productRouter = new ProductRouter();
 
     this.app.get("/api", (req: Request, res: Response) => {
       res.send(`Welcome to fpistore.net API !`);
@@ -58,6 +60,7 @@ export default class App {
 
     this.app.use("/api/auth", authRouter.getRouter());
     this.app.use("/api/user", userRouter.getRouter());
+    this.app.use("/api/product", productRouter.getRouter());
   }
 
   public start(): void {

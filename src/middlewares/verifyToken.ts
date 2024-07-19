@@ -1,8 +1,7 @@
 import { User } from "@prisma/client";
-import { appConfig } from "../utils/config";
 import { NextFunction, Request, Response } from "express";
-import { sign, TokenExpiredError, verify } from "jsonwebtoken";
-import prisma from "../prisma";
+import { TokenExpiredError, verify } from "jsonwebtoken";
+import { appConfig } from "../utils/config";
 
 const secretKey = appConfig.secret;
 
@@ -16,10 +15,6 @@ declare global {
   }
 }
 
-const generateAccessToken = (user: PayloadToken) => {
-  return sign(user, secretKey, { expiresIn: "15m" });
-};
-
 export const verifyToken = (
   req: Request,
   res: Response,
@@ -29,47 +24,18 @@ export const verifyToken = (
 
   if (!token) {
     return res.status(401).send({
-      message: "Token is missing",
+      message: "token is missing",
     });
   }
-
-  verify(token, secretKey, async (err, payload) => {
+  verify(token, secretKey, (err, payload) => {
     if (err) {
       if (err instanceof TokenExpiredError) {
-        const expiredPayload = verify(token, secretKey, {
-          ignoreExpiration: true,
-        }) as PayloadToken;
-
-        const storedToken = await prisma.refreshToken.findFirst({
-          where: { userId: expiredPayload.id },
-        });
-
-        if (!storedToken) {
-          return res.status(401).send({
-            message: "Invalid refresh token",
-          });
-        }
-
-        verify(storedToken.token, secretKey, (refreshErr, refreshPayload) => {
-          if (refreshErr) {
-            return res.status(401).send({
-              message: "Invalid refresh token",
-            });
-          }
-
-          const userId = (refreshPayload as PayloadToken).id;
-          const newAccessToken = generateAccessToken({ id: userId });
-
-          res.setHeader("Authorization", `Bearer ${newAccessToken}`);
-          res.locals.user = { id: userId };
-          return next();
-        });
+        return res.status(401).send({ message: "token expired", token });
       } else {
-        return res.status(401).send({ message: "Invalid access token" });
+        return res.status(401).send({ message: "invalid token" });
       }
-    } else {
-      res.locals.user = payload as PayloadToken;
-      next();
     }
+    res.locals.user = payload as PayloadToken;
+    next();
   });
 };

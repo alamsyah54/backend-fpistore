@@ -12,38 +12,33 @@ export const signInService = async (body: BodyPayload) => {
   try {
     const { email, password, isRememberMe } = body;
 
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!user) {
-      throw new Error("Incorrect Email Address or Password");
+      throw new Error("User not found");
     }
 
-    const isPasswordValid = await comparePassword(
-      String(password),
-      String(user.password)
-    );
+    const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error("Incorrect Password");
+      throw new Error("Invalid credentials");
     }
 
     const accessToken = sign({ id: user.id }, appConfig.secret, {
       expiresIn: "15m",
     });
 
-    let refreshToken;
+    const refreshTokenExpiresIn = isRememberMe ? "7d" : "24h";
+    const refreshToken = sign({ id: user.id }, appConfig.secret, {
+      expiresIn: refreshTokenExpiresIn,
+    });
 
-    if (!isRememberMe) {
-      refreshToken = sign({ id: user.id }, appConfig.secret, {
-        expiresIn: "1d",
-      });
-    } else {
-      refreshToken = sign({ id: user.id }, appConfig.secret, {
-        expiresIn: "7d",
-      });
-    }
+    const expiresAt = new Date(
+      Date.now() +
+        (isRememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000)
+    );
 
     const existingToken = await prisma.refreshToken.findFirst({
       where: { userId: user.id },
@@ -52,20 +47,25 @@ export const signInService = async (body: BodyPayload) => {
     if (existingToken) {
       await prisma.refreshToken.update({
         where: { id: existingToken.id },
-        data: { token: refreshToken },
+        data: {
+          token: refreshToken,
+          expiresAt,
+        },
       });
     } else {
       await prisma.refreshToken.create({
         data: {
           token: refreshToken,
           userId: user.id,
+          createdAt: new Date(),
+          expiresAt,
         },
       });
     }
 
     return {
       msg: `Sign In Successfully as ${email}`,
-      token: accessToken,
+      accessToken: accessToken,
     };
   } catch (error) {
     throw error;
