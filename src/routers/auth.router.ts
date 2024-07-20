@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { verifyToken } from "../middlewares/verifyToken";
+import { signUpValidator } from "../middlewares/validator/signUpValidator";
+import { signInValidator } from "../middlewares/validator/signInValidator";
 
 export class AuthRouter {
   private router: Router;
@@ -13,8 +15,16 @@ export class AuthRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post("/sign-up", this.authController.signUpController);
-    this.router.post("/sign-in", this.authController.signInController);
+    this.router.post(
+      "/sign-up",
+      signUpValidator,
+      this.authController.signUpController
+    );
+    this.router.post(
+      "/sign-in",
+      signInValidator,
+      this.authController.signInController
+    );
     this.router.get(
       "/keep-login",
       verifyToken,

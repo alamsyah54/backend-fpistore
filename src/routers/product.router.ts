@@ -2,6 +2,8 @@ import { Router } from "express";
 import { verifyToken } from "../middlewares/verifyToken";
 import { ProductController } from "../controllers/product.controller";
 import { uploader } from "../libs/uploader";
+import { createProductValidator } from "../middlewares/validator/createProductValidator";
+import { updateProductValidator } from "../middlewares/validator/updateProductValidator";
 
 export class ProductRouter {
   private router: Router;
@@ -18,6 +20,7 @@ export class ProductRouter {
       "/",
       verifyToken,
       uploader("IMG", "/images").array("image", 1),
+      createProductValidator,
       this.productController.createProductController
     );
     this.router.get("/", this.productController.getProductsController);
@@ -26,6 +29,7 @@ export class ProductRouter {
       "/:id",
       verifyToken,
       uploader("IMG", "/images").array("image", 1),
+      updateProductValidator,
       this.productController.updateProductController
     );
     this.router.delete("/:id", this.productController.deleteProductController);
