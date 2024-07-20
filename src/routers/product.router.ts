@@ -28,6 +28,7 @@ export class ProductRouter {
       uploader("IMG", "/images").array("image", 1),
       this.productController.updateProductController
     );
+    this.router.delete("/:id", this.productController.deleteProductController);
   }
 
   public getRouter(): Router {

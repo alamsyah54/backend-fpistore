@@ -1,5 +1,5 @@
 import prisma from "../../prisma";
-import { verify, sign, TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import { verify, sign } from "jsonwebtoken";
 import { appConfig } from "../../utils/config";
 
 export const refreshTokenService = async (accessToken: string) => {
@@ -19,7 +19,9 @@ export const refreshTokenService = async (accessToken: string) => {
       throw new Error("No valid refresh token found for this user");
     }
 
-    const decodedRefreshToken = verify(tokenRecord.token, appConfig.secret) as { id: number };
+    const decodedRefreshToken = verify(tokenRecord.token, appConfig.secret) as {
+      id: number;
+    };
 
     if (decodedRefreshToken.id !== decoded.id) {
       throw new Error("Invalid refresh token");
@@ -42,13 +44,6 @@ export const refreshTokenService = async (accessToken: string) => {
       accessToken: newAccessToken,
     };
   } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      throw new Error("Access token has expired, please sign in again");
-    } else if (error instanceof JsonWebTokenError) {
-      throw new Error("Invalid access token");
-    } else {
-      console.error("Refresh Token Error:", error);
-      throw new Error("An error occurred during token refresh.");
-    }
+    throw error;
   }
 };
