@@ -63,8 +63,14 @@ export const signInService = async (body: BodyPayload) => {
       });
     }
 
+    const userResponse = {
+      email: user.email,
+      name: user.name,
+    };
+
     return {
       msg: `Sign In Successfully as ${email}`,
+      data: userResponse,
       accessToken: accessToken,
     };
   } catch (error) {

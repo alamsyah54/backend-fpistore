@@ -4,11 +4,13 @@ import express, {
   Response,
   NextFunction,
   json,
+  urlencoded,
 } from "express";
 import { PORT } from "./config";
 import { AuthRouter } from "./routers/auth.router";
 import { UserRouter } from "./routers/user.router";
 import { ProductRouter } from "./routers/product.router";
+import cors from "cors";
 
 export default class App {
   private app: Express;
@@ -21,7 +23,9 @@ export default class App {
   }
 
   private configure(): void {
+    this.app.use(cors());
     this.app.use(json());
+    this.app.use(urlencoded({ extended: true }));
   }
 
   private handleError(): void {

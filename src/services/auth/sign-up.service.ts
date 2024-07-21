@@ -24,6 +24,7 @@ export const signUpService = async (body: Omit<User, "id">) => {
       data: {
         ...body,
         password: hashedPassword,
+        isVerified: true,
       },
     });
 
