@@ -1,8 +1,10 @@
 import { User } from "@prisma/client";
 import prisma from "../../prisma";
 import { comparePassword } from "../../libs/bcrypt";
-import { appConfig } from "../../utils/config";
 import { sign } from "jsonwebtoken";
+import { appConfig } from "../../utils/config";
+
+const secret = appConfig.secret;
 
 interface BodyPayload extends Pick<User, "email" | "password"> {
   isRememberMe: boolean;
@@ -26,12 +28,12 @@ export const signInService = async (body: BodyPayload) => {
       throw new Error("Invalid credentials");
     }
 
-    const accessToken = sign({ id: user.id }, appConfig.secret, {
+    const accessToken = sign({ id: user.id }, secret, {
       expiresIn: "15m",
     });
 
     const refreshTokenExpiresIn = isRememberMe ? "7d" : "24h";
-    const refreshToken = sign({ id: user.id }, appConfig.secret, {
+    const refreshToken = sign({ id: user.id }, secret, {
       expiresIn: refreshTokenExpiresIn,
     });
 

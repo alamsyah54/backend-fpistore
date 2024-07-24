@@ -20,19 +20,30 @@ export const verifyToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).send({
+      msg: "Authorization header is missing",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).send({
-      message: "token is missing",
+      msg: "Token is missing",
     });
   }
+
   verify(token, secretKey, (err, payload) => {
     if (err) {
       if (err instanceof TokenExpiredError) {
-        return res.status(401).send({ message: "token expired", token });
+        return res.status(401).send({ msg: "Token expired", token });
       } else {
-        return res.status(401).send({ message: "invalid token" });
+        return res
+          .status(401)
+          .send({ msg: "Invalid token", error: err.message, token });
       }
     }
     res.locals.user = payload as PayloadToken;

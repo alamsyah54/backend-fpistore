@@ -28,6 +28,7 @@ export class AuthController {
   async keepLoginController(req: Request, res: Response, next: NextFunction) {
     try {
       const id = res.locals.user.id;
+      console.log("reslocals", res.locals);
       const result = await KeepLoginService(Number(id));
 
       res.status(200).send(result);
