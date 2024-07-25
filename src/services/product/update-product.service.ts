@@ -3,7 +3,7 @@ import prisma from "../../prisma";
 import { join } from "path";
 import fs from "fs";
 
-const defaultDir = "../../../public/images";
+const defaultDir = "../../../docs/images";
 
 export const updateProductService = async (
   id: number,
@@ -46,7 +46,7 @@ export const updateProductService = async (
     if (file) {
       body.image = `/images/${file.filename}`;
 
-      const imagePath = join(__dirname, "../../../public" + product.image);
+      const imagePath = join(__dirname, "../../../docs" + product.image);
 
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);

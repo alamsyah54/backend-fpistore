@@ -2,7 +2,7 @@ import { join } from "path";
 import prisma from "../../prisma";
 import fs from "fs";
 
-const defaultDir = "../../../public/images";
+const defaultDir = "../../../docs/images";
 
 interface CreateProductBody {
   userId: string;

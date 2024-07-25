@@ -10,7 +10,7 @@ export const uploader = (
   folderName: string,
   filelimit?: number,
 ) => {
-  const defaultDir = join(__dirname, '../../public');
+  const defaultDir = join(__dirname, '../../docs');
 
   const storage = multer.diskStorage({
     destination: (
