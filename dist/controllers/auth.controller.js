@@ -41,6 +41,7 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = res.locals.user.id;
+                console.log("reslocals", res.locals);
                 const result = yield (0, keep_login_service_1.KeepLoginService)(Number(id));
                 res.status(200).send(result);
             }

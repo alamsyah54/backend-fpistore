@@ -29,7 +29,7 @@ const signUpService = (body) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const hashedPassword = yield (0, bcrypt_1.hashPassword)(password);
         const user = yield prisma_1.default.user.create({
-            data: Object.assign(Object.assign({}, body), { password: hashedPassword }),
+            data: Object.assign(Object.assign({}, body), { password: hashedPassword, isVerified: true }),
         });
         return {
             msg: "Sign Up Success",

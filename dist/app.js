@@ -22,12 +22,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importStar(require("express"));
 const config_1 = require("./config");
 const auth_router_1 = require("./routers/auth.router");
 const user_router_1 = require("./routers/user.router");
 const product_router_1 = require("./routers/product.router");
+const cors_1 = __importDefault(require("cors"));
 class App {
     constructor() {
         this.app = (0, express_1.default)();
@@ -36,7 +40,9 @@ class App {
         this.handleError();
     }
     configure() {
+        this.app.use((0, cors_1.default)());
         this.app.use((0, express_1.json)());
+        this.app.use((0, express_1.urlencoded)({ extended: true }));
     }
     handleError() {
         // not found

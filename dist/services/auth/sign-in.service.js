@@ -15,8 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.signInService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 const bcrypt_1 = require("../../libs/bcrypt");
-const config_1 = require("../../utils/config");
 const jsonwebtoken_1 = require("jsonwebtoken");
+const config_1 = require("../../utils/config");
+const secret = config_1.appConfig.secret;
 const signInService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password, isRememberMe } = body;
@@ -30,11 +31,11 @@ const signInService = (body) => __awaiter(void 0, void 0, void 0, function* () {
         if (!isPasswordValid) {
             throw new Error("Invalid credentials");
         }
-        const accessToken = (0, jsonwebtoken_1.sign)({ id: user.id }, config_1.appConfig.secret, {
+        const accessToken = (0, jsonwebtoken_1.sign)({ id: user.id }, secret, {
             expiresIn: "15m",
         });
         const refreshTokenExpiresIn = isRememberMe ? "7d" : "24h";
-        const refreshToken = (0, jsonwebtoken_1.sign)({ id: user.id }, config_1.appConfig.secret, {
+        const refreshToken = (0, jsonwebtoken_1.sign)({ id: user.id }, secret, {
             expiresIn: refreshTokenExpiresIn,
         });
         const expiresAt = new Date(Date.now() +
@@ -61,8 +62,13 @@ const signInService = (body) => __awaiter(void 0, void 0, void 0, function* () {
                 },
             });
         }
+        const userResponse = {
+            email: user.email,
+            name: user.name,
+        };
         return {
             msg: `Sign In Successfully as ${email}`,
+            data: userResponse,
             accessToken: accessToken,
         };
     }
