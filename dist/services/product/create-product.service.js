@@ -16,7 +16,7 @@ exports.createProductService = void 0;
 const path_1 = require("path");
 const prisma_1 = __importDefault(require("../../prisma"));
 const fs_1 = __importDefault(require("fs"));
-const defaultDir = "../../../public/images";
+const defaultDir = "../../../docs/images";
 const createProductService = (body, file) => __awaiter(void 0, void 0, void 0, function* () {
     let imagePath;
     try {

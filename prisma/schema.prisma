@@ -46,18 +46,19 @@ model RefreshToken {
 }
 
 model Product {
-  id          Int        @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
-  description String     @db.LongText
+  description String      @db.LongText
   feature     Json?
   price       Int
   stock       Int
   image       String
   color       String
-  isAvailable Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  isAvailable Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   discount    Discount[]
+  OrderItem   OrderItem[]
 
   @@map("products")
 }
@@ -72,4 +73,71 @@ model Discount {
   product     Product  @relation(fields: [productId], references: [id])
 
   @@map("discounts")
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  orderNumber String
+  OrderItem   OrderItem[]
+  totalAmount Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  status      OrderStatus @default(WAITING_FOR_PAYMENT)
+  Payment     Payment?
+  phoneNumber Int
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  WAITING_FOR_PAYMENT @map("WAITING_FOR_PAYMENT")
+  ORDER_PROCESSED     @map("ORDER_PROCESSED")
+  COMPLETED           @map("COMPLETED")
+}
+
+model OrderItem {
+  id        Int  @id @default(autoincrement())
+  qty       Int
+  total     Int
+  discValue Int?
+  price     Int
+
+  orderId   Int
+  productId Int
+
+  orders   Order   @relation(fields: [orderId], references: [id])
+  products Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id              Int           @id @default(autoincrement())
+  invoiceNumber   String
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   PaymentMethod
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  amount          Int
+  snapToken       String?
+  snapRedirectUrl String?
+
+  orderId Int @unique
+
+  orders Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  COMPLETED @map("COMPLETED")
+  CANCELLED @map("CANCELLED")
+  DENIED    @map("DENIED")
+  EXPIRED   @map("EXPIRED")
+  PENDING   @map("PENDING")
+}
+
+enum PaymentMethod {
+  QRIS            @map("QRIS")
+  VIRTUAL_ACCOUNT @map("VIRTUAL_ACCOUNT")
 }

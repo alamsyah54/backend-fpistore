@@ -7,7 +7,7 @@ exports.uploader = void 0;
 const multer_1 = __importDefault(require("multer"));
 const path_1 = require("path");
 const uploader = (filePrefix, folderName, filelimit) => {
-    const defaultDir = (0, path_1.join)(__dirname, '../../public');
+    const defaultDir = (0, path_1.join)(__dirname, '../../docs');
     const storage = multer_1.default.diskStorage({
         destination: (req, file, cb) => {
             const destination = folderName ? defaultDir + folderName : defaultDir;
