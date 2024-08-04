@@ -11,6 +11,7 @@ import { AuthRouter } from "./routers/auth.router";
 import { UserRouter } from "./routers/user.router";
 import { ProductRouter } from "./routers/product.router";
 import cors from "cors";
+import { OrderRouter } from "./routers/order.router";
 
 export default class App {
   private app: Express;
@@ -57,6 +58,7 @@ export default class App {
     const authRouter = new AuthRouter();
     const userRouter = new UserRouter();
     const productRouter = new ProductRouter();
+    const orderRouter = new OrderRouter();
 
     this.app.get("/api", (req: Request, res: Response) => {
       res.send(`Welcome to fpistore.net API !`);
@@ -65,6 +67,7 @@ export default class App {
     this.app.use("/api/auth", authRouter.getRouter());
     this.app.use("/api/user", userRouter.getRouter());
     this.app.use("/api/product", productRouter.getRouter());
+    this.app.use("/api/order", orderRouter.getRouter());
   }
 
   public start(): void {

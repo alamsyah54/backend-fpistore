@@ -16,7 +16,7 @@ exports.updateProductService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 const path_1 = require("path");
 const fs_1 = __importDefault(require("fs"));
-const defaultDir = "../../../public/images";
+const defaultDir = "../../../docs/images";
 const updateProductService = (id, body, userId, file) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, feature } = body;
@@ -45,7 +45,7 @@ const updateProductService = (id, body, userId, file) => __awaiter(void 0, void 
         }
         if (file) {
             body.image = `/images/${file.filename}`;
-            const imagePath = (0, path_1.join)(__dirname, "../../../public" + product.image);
+            const imagePath = (0, path_1.join)(__dirname, "../../../docs" + product.image);
             if (fs_1.default.existsSync(imagePath)) {
                 fs_1.default.unlinkSync(imagePath);
             }
